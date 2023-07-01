@@ -50,11 +50,11 @@ swag init --dir ./cmd/http,./internal/todo --parseDependency --parseInternal
 
 > **Note:** The documentation is automatically generated based on the code. You don't need to manually update it.
 
-<!-- ## Authentication
+## Authentication
 
 This project uses [JWT](https://jwt.io/) for authentication. The JWT secret is stored in the `.env` file.
 
-The JWT is store on a Cookie. -->
+The JWT is store on a Cookie.
 
 ## Database
 
