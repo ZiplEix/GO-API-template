@@ -59,3 +59,40 @@ The JWT is store on a Cookie. -->
 ## Database
 
 This project uses [PostgreSQL](https://www.postgresql.org/) as the database. The database configuration is stored in the `.env` file.
+
+## Architecture
+
+This project uses the [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) as the architecture.
+
+### Project structure
+
+```
+.
+├── cmd                     # Application commands (entry points)
+│   └── http                # HTTP server
+│       └── main.go         # Main file
+├── config                  # Configuration files
+│   └── viper.go            # Configuration file for environment variables
+├── docs                    # Swagger files (auto generated)
+│   ├── docs.go
+│   ├── swagger.json
+│   └── swagger.yaml
+├── Internal                # Business logic
+│   ├── todo                # Domain
+│   │   ├── controller.go   # Controller layer (more details in file)
+│   │   ├── router.go       # Router layer
+│   │   └── storage.go      # Storage layer (more details in file)
+│   └── storage             # Databases
+│       └── postgres.go
+├── pkg                     # Packages
+│   └── shutdown
+│       └── gracefully.go   # Gracefully shutdown
+├── .env                    # Environment variables
+├── .gitignore
+├── docker-compose.yml
+├── Dockerfile
+├── go.mod
+├── go.sum
+├── README.md
+└── .air.toml
+```
