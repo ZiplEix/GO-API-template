@@ -37,6 +37,30 @@ definitions:
       id:
         type: string
     type: object
+  user.createUserRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  user.createUserResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  user.loginUserRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  user.loginUserResponse:
+    properties:
+      token:
+        type: string
+    type: object
 info:
   contact:
     name: ZiplEix
@@ -44,6 +68,50 @@ info:
   title: API Template
   version: "2.0"
 paths:
+  /login:
+    post:
+      consumes:
+      - '*/*'
+      description: login one user.
+      parameters:
+      - description: User to login
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.loginUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.loginUserResponse'
+      summary: Login one user.
+      tags:
+      - users
+  /register:
+    post:
+      consumes:
+      - '*/*'
+      description: creates one user and loged in him.
+      parameters:
+      - description: User to create
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.createUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.createUserResponse'
+      summary: Create one user and login him.
+      tags:
+      - users
   /todos:
     get:
       consumes:
