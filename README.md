@@ -38,17 +38,23 @@ If you see the message `pong`, then everything is working correctly.
 
 This project uses [Swagger](https://swagger.io/) for API documentation. You can access the documentation at [http://localhost:3000/swagger/index.html](http://localhost:3000/swagger/index.html).
 
-> **Note:** The swagger documentation is not available currently due to a conflict with the GORM library. It will be fixed in the future.
+### Updating the documentation
+
+To update the documentation, you need to run the following command:
+
+```bash
+swag init --dir ./cmd/http,./internal/todo --parseDependency --parseInternal
+```
 
 > **Note:** The documentation is only available when the project is running.
 
 > **Note:** The documentation is automatically generated based on the code. You don't need to manually update it.
 
-## Authentication
+<!-- ## Authentication
 
 This project uses [JWT](https://jwt.io/) for authentication. The JWT secret is stored in the `.env` file.
 
-The JWT is store on a Cookie.
+The JWT is store on a Cookie. -->
 
 ## Database
 

@@ -1,4 +1,4 @@
-FROM golang:1.20.2
+FROM golang:1.20.2 as builder
 
 WORKDIR /usr/src/app
 
@@ -8,5 +8,3 @@ RUN go install github.com/swaggo/swag/cmd/swag@latest
 COPY . .
 
 RUN go mod tidy
-
-RUN swag init --dir ./,./handlers
