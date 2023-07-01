@@ -79,6 +79,7 @@ This project uses the [Clean Architecture](https://blog.cleancoder.com/uncle-bob
 │   └── swagger.yaml
 ├── Internal                # Business logic
 │   ├── todo                # Domain
+│   │   ├── middleware.go   # Middleware layer (if needed)
 │   │   ├── controller.go   # Controller layer (more details in file)
 │   │   ├── router.go       # Router layer
 │   │   └── storage.go      # Storage layer (more details in file)

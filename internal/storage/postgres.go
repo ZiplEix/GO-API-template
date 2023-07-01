@@ -5,13 +5,14 @@ import (
 	"log"
 
 	"github.com/ZiplEix/API_template/internal/todo"
+	"github.com/ZiplEix/API_template/internal/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-func BootstrapPostgres(user, passwrd, name string) (*gorm.DB, error) {
-	dsn := fmt.Sprintf("host=db user=%s password=%s dbname=%s port=5432 sslmode=disable", user, passwrd, name)
+func BootstrapPostgres(owner, passwrd, name string) (*gorm.DB, error) {
+	dsn := fmt.Sprintf("host=db user=%s password=%s dbname=%s port=5432 sslmode=disable", owner, passwrd, name)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
@@ -25,7 +26,7 @@ func BootstrapPostgres(user, passwrd, name string) (*gorm.DB, error) {
 	db.Logger = db.Logger.LogMode(logger.Info)
 
 	log.Println("Migrating database...")
-	err = db.AutoMigrate(todo.TodoDB{})
+	err = db.AutoMigrate(todo.TodoDB{}, user.UserDB{})
 	if err != nil {
 		log.Fatal("Failed to migrate database.\n", err)
 		return db, err

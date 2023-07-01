@@ -12,7 +12,7 @@ type EnvVars struct {
 	DB_PASSWORD string `mapstructure:"DB_PASSWORD"`
 	DB_NAME     string `mapstructure:"DB_NAME"`
 	PORT        string `mapstructure:"PORT"`
-	SECRET      string `mapstructure:"SECRET"`
+	JWT_SECRET  string `mapstructure:"JWT_SECRET"`
 }
 
 func LoadConfig() (config EnvVars, err error) {
@@ -23,7 +23,7 @@ func LoadConfig() (config EnvVars, err error) {
 			DB_PASSWORD: os.Getenv("DB_PASSWORD"),
 			DB_NAME:     os.Getenv("DB_NAME"),
 			PORT:        os.Getenv("PORT"),
-			SECRET:      os.Getenv("SECRET"),
+			JWT_SECRET:  os.Getenv("JWT_SECRET"),
 		}, nil
 	}
 
@@ -57,8 +57,8 @@ func LoadConfig() (config EnvVars, err error) {
 		err = errors.New("PORT is not set")
 		return
 	}
-	if config.SECRET == "" {
-		err = errors.New("SECRET is not set")
+	if config.JWT_SECRET == "" {
+		err = errors.New("JWT_SECRET is not set")
 	}
 
 	return
