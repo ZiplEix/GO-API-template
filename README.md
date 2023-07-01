@@ -43,7 +43,7 @@ This project uses [Swagger](https://swagger.io/) for API documentation. You can 
 To update the documentation, you need to run the following command:
 
 ```bash
-swag init --dir ./cmd/http,./internal/todo --parseDependency --parseInternal
+swag init --dir ./cmd/http,./internal/ --parseDependency --parseInternal
 ```
 
 > **Note:** The documentation is only available when the project is running.
