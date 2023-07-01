@@ -104,13 +104,14 @@ func router(app *fiber.App, db *gorm.DB) {
 	// add docs
 	app.Get("/swagger/*", swagger.HandlerDefault)
 
-	// todo routes
-	todoStore := todo.NewTodoStorage(db)
-	todoController := todo.NewTodoController(todoStore)
-	todo.AddTodoRoutes(app, todoController)
-
 	// user routes
 	userStore := user.NewUserStorage(db)
 	userController := user.NewUserController(userStore)
 	user.AddUserRoutes(app, userController)
+
+	// todo routes
+	todoStore := todo.NewTodoStorage(db)
+	todoController := todo.NewTodoController(todoStore)
+	todo.AddTodoRoutes(app, todoController, userController)
+
 }

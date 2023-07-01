@@ -29,6 +29,7 @@ type TodoDB struct {
 	Title       string `json:"title" gorm:"text;not null;default:null"`
 	Description string `json:"description" gorm:"text;not null;default:null"`
 	Completed   bool   `json:"completed" gorm:"not null;default:false"`
+	OwnerID     uint   `json:"owner_id" gorm:"not null;default:null"`
 }
 
 type TodoStorage struct {
@@ -41,11 +42,12 @@ func NewTodoStorage(db *gorm.DB) *TodoStorage {
 }
 
 // CreateTodo creates a todo in the database.
-func (s *TodoStorage) CreateTodo(title, description string, completed bool, ctx context.Context) (string, error) {
+func (s *TodoStorage) CreateTodo(title, description string, completed bool, ownerID uint, ctx context.Context) (string, error) {
 	todo := TodoDB{
 		Title:       title,
 		Description: description,
 		Completed:   completed,
+		OwnerID:     ownerID,
 	}
 	result := s.db.Create(&todo)
 	if result.Error != nil {
@@ -59,9 +61,9 @@ func (s *TodoStorage) CreateTodo(title, description string, completed bool, ctx 
 }
 
 // GetAllTodos gets all todos from the database.
-func (s *TodoStorage) GetAllTodos(ctx context.Context) ([]TodoDB, error) {
+func (s *TodoStorage) GetAllTodos(ownerID uint, ctx context.Context) ([]TodoDB, error) {
 	var todos []TodoDB
-	result := s.db.Find(&todos)
+	result := s.db.Find(&todos, "owner_id = ?", ownerID)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -70,9 +72,10 @@ func (s *TodoStorage) GetAllTodos(ctx context.Context) ([]TodoDB, error) {
 }
 
 // GetTodoByID gets a todo from the database by its ID.
-func (s *TodoStorage) GetTodoByID(id string, ctx context.Context) (*TodoDB, error) {
+func (s *TodoStorage) GetTodoByID(ownerID uint, id string, ctx context.Context) (*TodoDB, error) {
 	var todo TodoDB
-	result := s.db.First(&todo, id)
+	// result := s.db.First(&todo, id)
+	result := s.db.Where("owner_id = ? AND id = ?", ownerID, id).First(&todo)
 	if result.Error != nil {
 		return nil, result.Error
 	}

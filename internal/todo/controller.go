@@ -1,6 +1,9 @@
 package todo
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/ZiplEix/API_template/internal/user"
+	"github.com/gofiber/fiber/v2"
+)
 
 // Usage:
 // Ce package fournit un contrôleur pour gérer les requêtes HTTP liées aux tâches à faire ("todos").
@@ -43,6 +46,9 @@ type createTodoResponse struct {
 // @Success 200 {object} createTodoResponse
 // @Router /todos [post]
 func (t *TodoController) Create(c *fiber.Ctx) error {
+	// get the user id from the context
+	userID := c.Locals("user").(*user.UserDB).ID
+
 	// parse the request body
 	var req createTodoRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -56,6 +62,7 @@ func (t *TodoController) Create(c *fiber.Ctx) error {
 		req.Title,
 		req.Description,
 		false,
+		userID,
 		c.Context(),
 	)
 	if err != nil {
@@ -78,8 +85,11 @@ func (t *TodoController) Create(c *fiber.Ctx) error {
 // @Success 200 {object} []TodoDB
 // @Router /todos [get]
 func (t *TodoController) GetAll(c *fiber.Ctx) error {
+	// get the user id from the context
+	userID := c.Locals("user").(*user.UserDB).ID
+
 	// get all todos
-	todos, err := t.storage.GetAllTodos(c.Context())
+	todos, err := t.storage.GetAllTodos(userID, c.Context())
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Fail fetching todos",
@@ -99,11 +109,14 @@ func (t *TodoController) GetAll(c *fiber.Ctx) error {
 // @Success 200 {object} TodoDB
 // @Router /todos/{id} [get]
 func (t *TodoController) GetOne(c *fiber.Ctx) error {
+	// get the user id from the context
+	userID := c.Locals("user").(*user.UserDB).ID
+
 	// get the todo id
 	id := c.Params("id")
 
 	// get the todo
-	todo, err := t.storage.GetTodoByID(id, c.Context())
+	todo, err := t.storage.GetTodoByID(userID, id, c.Context())
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Fail fetching todo",
@@ -123,10 +136,13 @@ func (t *TodoController) GetOne(c *fiber.Ctx) error {
 // @Success 200
 // @Router /todos/{id} [put]
 func (t *TodoController) Update(c *fiber.Ctx) error {
+	// get the user id from the context
+	userID := c.Locals("user").(*user.UserDB).ID
+
 	// get the todo id
 	id := c.Params("id")
 
-	todo, err := t.storage.GetTodoByID(id, c.Context())
+	todo, err := t.storage.GetTodoByID(userID, id, c.Context())
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Fail fetching todo",
@@ -161,10 +177,13 @@ func (t *TodoController) Update(c *fiber.Ctx) error {
 // @Success 200
 // @Router /todos/{id} [delete]
 func (t *TodoController) Delete(c *fiber.Ctx) error {
+	// get the user id from the context
+	userID := c.Locals("user").(*user.UserDB).ID
+
 	// get the todo id
 	id := c.Params("id")
 
-	todo, err := t.storage.GetTodoByID(id, c.Context())
+	todo, err := t.storage.GetTodoByID(userID, id, c.Context())
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Fail fetching todo",
