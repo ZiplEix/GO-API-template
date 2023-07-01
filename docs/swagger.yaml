@@ -150,4 +150,61 @@ paths:
       summary: Create one todo.
       tags:
       - todos
+  /todos/{id}:
+    delete:
+      consumes:
+      - '*/*'
+      description: deletes one todo by id.
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Delete one todo.
+      tags:
+      - todos
+    get:
+      consumes:
+      - '*/*'
+      description: fetch one todo by id.
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/todo.TodoDB'
+      summary: Get one todo.
+      tags:
+      - todos
+    put:
+      consumes:
+      - '*/*'
+      description: updates one todo by id.
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Update one todo.
+      tags:
+      - todos
 swagger: "2.0"

@@ -68,3 +68,40 @@ func (s *TodoStorage) GetAllTodos(ctx context.Context) ([]TodoDB, error) {
 
 	return todos, nil
 }
+
+// GetTodoByID gets a todo from the database by its ID.
+func (s *TodoStorage) GetTodoByID(id string, ctx context.Context) (*TodoDB, error) {
+	var todo TodoDB
+	result := s.db.First(&todo, id)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &todo, nil
+}
+
+// UpdateTodo updates a todo in the database.
+func (s *TodoStorage) UpdateTodo(
+	updatedTodo TodoDB,
+	ctx context.Context,
+) (*TodoDB, error) {
+	result := s.db.Save(&updatedTodo)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &updatedTodo, nil
+}
+
+// DeleteTodo deletes a todo from the database.
+func (s *TodoStorage) DeleteTodo(
+	toDelete TodoDB,
+	ctx context.Context,
+) error {
+	result := s.db.Delete(&toDelete)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}

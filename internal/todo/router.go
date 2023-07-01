@@ -7,7 +7,7 @@ func AddTodoRoutes(app *fiber.App, controller *TodoController) {
 
 	todos.Post("/", controller.Create)
 	todos.Get("/", controller.GetAll)
-	// todos.Get("/todos/:id", controller.Get)
-	// todos.Put("/todos/:id", controller.Update)
-	// todos.Delete("/todos/:id", controller.Delete)
+	todos.Get("/:id", controller.GetOne)
+	todos.Put("/:id", controller.Update)
+	todos.Delete("/:id", controller.Delete)
 }

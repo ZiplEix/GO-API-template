@@ -89,3 +89,98 @@ func (t *TodoController) GetAll(c *fiber.Ctx) error {
 	// return the todos
 	return c.Status(fiber.StatusOK).JSON(todos)
 }
+
+// @Summary Get one todo.
+// @Description fetch one todo by id.
+// @Tags todos
+// @Accept */*
+// @Produce json
+// @Param id path string true "Todo ID"
+// @Success 200 {object} TodoDB
+// @Router /todos/{id} [get]
+func (t *TodoController) GetOne(c *fiber.Ctx) error {
+	// get the todo id
+	id := c.Params("id")
+
+	// get the todo
+	todo, err := t.storage.GetTodoByID(id, c.Context())
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Fail fetching todo",
+		})
+	}
+
+	// return the todo
+	return c.Status(fiber.StatusOK).JSON(todo)
+}
+
+// @Summary Update one todo.
+// @Description updates one todo by id.
+// @Tags todos
+// @Accept */*
+// @Produce json
+// @Param id path string true "Todo ID"
+// @Success 200
+// @Router /todos/{id} [put]
+func (t *TodoController) Update(c *fiber.Ctx) error {
+	// get the todo id
+	id := c.Params("id")
+
+	todo, err := t.storage.GetTodoByID(id, c.Context())
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Fail fetching todo",
+		})
+	}
+
+	// parse the request body
+	if err := c.BodyParser(&todo); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid request body",
+		})
+	}
+
+	// update the todo
+	todo, err = t.storage.UpdateTodo(*todo, c.Context())
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Fail updating todo",
+		})
+	}
+
+	// return the todo
+	return c.Status(fiber.StatusOK).JSON(todo)
+}
+
+// @Summary Delete one todo.
+// @Description deletes one todo by id.
+// @Tags todos
+// @Accept */*
+// @Produce json
+// @Param id path string true "Todo ID"
+// @Success 200
+// @Router /todos/{id} [delete]
+func (t *TodoController) Delete(c *fiber.Ctx) error {
+	// get the todo id
+	id := c.Params("id")
+
+	todo, err := t.storage.GetTodoByID(id, c.Context())
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Fail fetching todo",
+		})
+	}
+
+	// delete the todo
+	err = t.storage.DeleteTodo(*todo, c.Context())
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Fail deleting todo",
+		})
+	}
+
+	// return the todo
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Todo deleted",
+	})
+}
