@@ -18,77 +18,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/login": {
-            "post": {
-                "description": "login one user.",
-                "consumes": [
-                    "*/*"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Login one user.",
-                "parameters": [
-                    {
-                        "description": "User to login",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.loginUserRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/user.loginUserResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/register": {
-            "post": {
-                "description": "creates one user and loged in him.",
-                "consumes": [
-                    "*/*"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Create one user and login him.",
-                "parameters": [
-                    {
-                        "description": "User to create",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.createUserRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/user.createUserResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/todos": {
             "get": {
-                "description": "fetch every todo available.",
+                "description": "fetch every todo available even if marqued as deleted.",
                 "consumes": [
                     "*/*"
                 ],
@@ -98,23 +30,23 @@ const docTemplate = `{
                 "tags": [
                     "todos"
                 ],
-                "summary": "Get all todos.",
+                "summary": "Get all todos even deleted",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/todo.TodoDB"
+                                "$ref": "#/definitions/models.Todo"
                             }
                         }
                     }
                 }
             },
             "post": {
-                "description": "creates one todo.",
+                "description": "create a single todo.",
                 "consumes": [
-                    "*/*"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -122,7 +54,7 @@ const docTemplate = `{
                 "tags": [
                     "todos"
                 ],
-                "summary": "Create one todo.",
+                "summary": "Create a todo.",
                 "parameters": [
                     {
                         "description": "Todo to create",
@@ -130,7 +62,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/todo.createTodoRequest"
+                            "$ref": "#/definitions/models.Todo"
                         }
                     }
                 ],
@@ -138,17 +70,44 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/todo.createTodoResponse"
+                            "$ref": "#/definitions/models.Todo"
                         }
                     }
                 }
             }
         },
-        "/todos/{id}": {
+        "/todos/:id": {
             "get": {
-                "description": "fetch one todo by id.",
+                "description": "fetch a single todo by id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "todos"
+                ],
+                "summary": "Get a sigle todo",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Todo ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Todo"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "update a single todo.",
                 "consumes": [
-                    "*/*"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -156,7 +115,43 @@ const docTemplate = `{
                 "tags": [
                     "todos"
                 ],
-                "summary": "Get one todo.",
+                "summary": "Update a todo.",
+                "parameters": [
+                    {
+                        "description": "Todo update data",
+                        "name": "todo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Todo"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Todo ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Todo"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "delete a single todo by id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "todos"
+                ],
+                "summary": "Delete a single todo.",
                 "parameters": [
                     {
                         "type": "string",
@@ -170,62 +165,8 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/todo.TodoDB"
+                            "$ref": "#/definitions/models.Todo"
                         }
-                    }
-                }
-            },
-            "put": {
-                "description": "updates one todo by id.",
-                "consumes": [
-                    "*/*"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "todos"
-                ],
-                "summary": "Update one todo.",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Todo ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            },
-            "delete": {
-                "description": "deletes one todo by id.",
-                "consumes": [
-                    "*/*"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "todos"
-                ],
-                "summary": "Delete one todo.",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Todo ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
                     }
                 }
             }
@@ -244,7 +185,7 @@ const docTemplate = `{
                 }
             }
         },
-        "todo.TodoDB": {
+        "models.Todo": {
             "type": "object",
             "properties": {
                 "completed": {
@@ -256,9 +197,6 @@ const docTemplate = `{
                 "deletedAt": {
                     "$ref": "#/definitions/gorm.DeletedAt"
                 },
-                "description": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "integer"
                 },
@@ -269,75 +207,18 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
-        },
-        "todo.createTodoRequest": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "todo.createTodoResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.createUserRequest": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.createUserResponse": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.loginUserRequest": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.loginUserResponse": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "type": "string"
-                }
-            }
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "2.0",
+	Version:          "0.1",
 	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "API Template",
-	Description:      "An example template of a Golang backend API using Fiber and Postgres.",
+	Description:      "This is a sample API template.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
