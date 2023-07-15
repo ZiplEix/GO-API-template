@@ -7,6 +7,8 @@ import (
 	"github.com/ZiplEix/API_template/database"
 	"github.com/ZiplEix/API_template/router"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
@@ -28,6 +30,10 @@ func SetupAndRunApp() error {
 
 	// create app
 	app := fiber.New()
+
+	// Set log for fiber
+	app.Use(cors.New())
+	app.Use(logger.New())
 
 	// recover from panic
 	app.Use(recover.New())
