@@ -141,7 +141,7 @@ func Login(c *fiber.Ctx) error {
 }
 
 func Private(c *fiber.Ctx) error {
-	user := c.Get("user")
+	user := c.Locals("user").(models.User)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": user,
