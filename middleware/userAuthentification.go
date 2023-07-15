@@ -26,8 +26,12 @@ func AuthentificateUser(c *fiber.Ctx) error {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(os.Getenv("SECRET")), nil
+		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
+	if err != nil {
+		c.Status(http.StatusUnauthorized).SendString("Unauthorized")
+		return err
+	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// check expiration

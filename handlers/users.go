@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -61,6 +62,15 @@ func Signup(c *fiber.Ctx) error {
 		return err
 	}
 
+	// generate JWT
+	err = generateAndStoreJWT(user, c)
+	if err != nil {
+		c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Could not login",
+		})
+		return err
+	}
+
 	return c.Status(fiber.StatusCreated).JSON(user)
 }
 
@@ -112,36 +122,72 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	// generate JWT
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": user.ID,
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
-	})
-
-	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
+	err = generateAndStoreJWT(user, c)
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Could not login",
 		})
 		return err
 	}
+	// token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+	// 	"sub": user.ID,
+	// 	"exp": time.Now().Add(time.Hour * 24).Unix(),
+	// })
 
-	// send the JWT
-	c.Cookie(&fiber.Cookie{
-		Name:     "Authorization",
-		Value:    tokenString,
-		Expires:  time.Now().Add(24 * time.Hour),
-		HTTPOnly: true,
-		Secure:   true,
-		SameSite: "Lax",
-	})
+	// tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
+	// if err != nil {
+	// 	c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+	// 		"error": "Could not login",
+	// 	})
+	// 	return err
+	// }
+
+	// // send the JWT
+	// c.Cookie(&fiber.Cookie{
+	// 	Name:     "Authorization",
+	// 	Value:    tokenString,
+	// 	Expires:  time.Now().Add(24 * time.Hour),
+	// 	HTTPOnly: true,
+	// 	Secure:   true,
+	// 	SameSite: "Lax",
+	// })
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Success",
 	})
 }
 
+func generateAndStoreJWT(user models.User, c *fiber.Ctx) error {
+	fmt.Println("start generateAndStoreJWT")
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": user.ID,
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	if err != nil {
+		fmt.Println("err generateAndStoreJWT")
+		return err
+	}
+
+	// set the JWT as a cookie
+	c.Cookie(&fiber.Cookie{
+		Name:     "Authorization",
+		Value:    tokenString,
+		Expires:  time.Now().Add(time.Hour * 24),
+		HTTPOnly: true,
+		Secure:   true,
+		SameSite: "Lax",
+	})
+
+	fmt.Println("end generateAndStoreJWT")
+	return nil
+}
+
 func Private(c *fiber.Ctx) error {
 	user := c.Locals("user").(models.User)
+
+	fmt.Println("oui oui")
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": user,
