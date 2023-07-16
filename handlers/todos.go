@@ -14,9 +14,11 @@ import (
 // @success 200 {object} []models.Todo
 // @router /todos [get]
 func TodoGetAll(c *fiber.Ctx) error {
+	userId := c.Locals("user").(models.User).ID
+
 	todos := []models.Todo{}
 
-	database.DB.Db.Find(&todos)
+	database.DB.Db.Find(&todos, "user_id = ?", userId)
 
 	return c.Status(fiber.StatusOK).JSON(todos)
 }
@@ -29,11 +31,13 @@ func TodoGetAll(c *fiber.Ctx) error {
 // @Success 200 {object} models.Todo
 // @Router /todos/:id [get]
 func TodoGetOne(c *fiber.Ctx) error {
+	userId := c.Locals("user").(models.User).ID
+
 	id := c.Params("id")
 
 	todo := models.Todo{}
 
-	database.DB.Db.Find(&todo, id)
+	database.DB.Db.Where("user_id = ? AND id = ?", userId, id).First(&todo)
 
 	if todo.ID == 0 {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
@@ -44,59 +48,34 @@ func TodoGetOne(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(todo)
 }
 
-// @summary Get all todos even deleted
-// @description fetch every todo available even if marqued as deleted.
-// @tags todos
-// @accept */*
-// @produce application/json
-// @success 200 {object} []models.Todo
-// @router /todos [get]
-func TodoGetAllAdmin(c *fiber.Ctx) error {
-	todos := []models.Todo{}
-
-	database.DB.Db.Unscoped().Find(&todos)
-
-	return c.Status(fiber.StatusOK).JSON(todos)
-}
-
-// @summary Get a sigle todo
-// @description fetch a single todo by id.
-// @tags todos
-// @Param id path int true "Todo ID"
-// @Produce application/json
-// @Success 200 {object} models.Todo
-// @Router /todos/:id [get]
-func TodoGetOneAdmin(c *fiber.Ctx) error {
-	id := c.Params("id")
-
-	todo := models.Todo{}
-
-	database.DB.Db.Unscoped().Find(&todo, id)
-
-	if todo.ID == 0 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "Todo not found",
-		})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(todo)
+type TodoCreateRequest struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }
 
 // @Summary Create a todo.
 // @Description create a single todo.
 // @Tags todos
 // @Accept json
-// @Param todo body models.Todo true "Todo to create"
+// @Param todo body TodoCreateRequest true "Todo to create"
 // @Produce json
 // @Success 200 {object} models.Todo
 // @Router /todos [post]
 func TodoCreate(c *fiber.Ctx) error {
-	todo := new(models.Todo)
+	userId := c.Locals("user").(models.User).ID
 
-	if err := c.BodyParser(todo); err != nil {
+	var req TodoCreateRequest
+	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})
+	}
+
+	// create the todo
+	todo := models.Todo{
+		Title:       req.Title,
+		Description: req.Description,
+		UserID:      userId,
 	}
 
 	database.DB.Db.Create(&todo)
@@ -114,11 +93,13 @@ func TodoCreate(c *fiber.Ctx) error {
 // @Success 200 {object} models.Todo
 // @Router /todos/:id [put]
 func TodoUpdate(c *fiber.Ctx) error {
+	userId := c.Locals("user").(models.User).ID
+
 	id := c.Params("id")
 
 	todo := models.Todo{}
 
-	database.DB.Db.Find(&todo, id)
+	database.DB.Db.Where("user_id = ? AND id = ?", userId, id).First(&todo)
 
 	if todo.ID == 0 {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
@@ -145,11 +126,13 @@ func TodoUpdate(c *fiber.Ctx) error {
 // @Success 200 {object} models.Todo
 // @Router /todos/:id [delete]
 func TodoDelete(c *fiber.Ctx) error {
+	userId := c.Locals("user").(models.User).ID
+
 	id := c.Params("id")
 
 	todo := models.Todo{}
 
-	database.DB.Db.Find(&todo, id)
+	database.DB.Db.Where("user_id = ? AND id = ?", userId, id).First(&todo)
 
 	if todo.ID == 0 {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
