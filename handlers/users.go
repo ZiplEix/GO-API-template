@@ -129,28 +129,6 @@ func Login(c *fiber.Ctx) error {
 		})
 		return err
 	}
-	// token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-	// 	"sub": user.ID,
-	// 	"exp": time.Now().Add(time.Hour * 24).Unix(),
-	// })
-
-	// tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
-	// if err != nil {
-	// 	c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-	// 		"error": "Could not login",
-	// 	})
-	// 	return err
-	// }
-
-	// // send the JWT
-	// c.Cookie(&fiber.Cookie{
-	// 	Name:     "Authorization",
-	// 	Value:    tokenString,
-	// 	Expires:  time.Now().Add(24 * time.Hour),
-	// 	HTTPOnly: true,
-	// 	Secure:   true,
-	// 	SameSite: "Lax",
-	// })
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Success",
